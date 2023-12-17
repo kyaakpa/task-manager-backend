@@ -10,10 +10,10 @@ app.use(express.json());
 //create a task
 app.post("/tasks", async (req, res) => {
   try {
-    const { description } = req.body;
+    const { description, prettyDate } = req.body;
     const newTask = await pool.query(
-      "INSERT INTO tasks (description) VALUES($1) RETURNING *",
-      [description]
+      "INSERT INTO tasks (description, finishBy) VALUES($1, $2) RETURNING *",
+      [description, prettyDate]
     );
     res.json(newTask.rows);
   } catch (err) {
@@ -34,7 +34,7 @@ app.get("/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const getSingleTask = await pool.query(
-      "SELECT * FROM tasks WHERE task_id= $1",
+      "SELECT * FROM tasks WHERE task_id=$1",
       [id]
     );
     res.json(getSingleTask.rows);
@@ -46,11 +46,10 @@ app.get("/tasks/:id", async (req, res) => {
 app.put("/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { description } = req.body;
-    console.log(req.body);
+    const { description, prettyDate } = req.body;
     const updateTask = await pool.query(
-      "UPDATE tasks SET description=$1 WHERE task_id=$2",
-      [description, id]
+      "UPDATE tasks SET description=$1, finishby=$2 WHERE task_id=$3",
+      [description, prettyDate, id]
     );
     res.json("Task was updated.");
   } catch (err) {
