@@ -17,11 +17,8 @@ app.get("/", (req, res) => {
 
 //create a task
 app.post("/tasks", async (req, res) => {
-  client.connect((err) => {
-    if (err) throw err;
-  });
-
   try {
+    client.connect();
     const { description, prettyDate } = req.body;
     const newTask = await client.query(
       "INSERT INTO tasks (description, finishby) VALUES($1, $2) RETURNING *",
@@ -34,10 +31,8 @@ app.post("/tasks", async (req, res) => {
 });
 //get all tasks
 app.get("/tasks", async (req, res) => {
-  client.connect((err) => {
-    if (err) throw err;
-  });
   try {
+    client.connect();
     const allTasks = await client.query("SELECT * FROM tasks");
     res.json(allTasks.rows);
   } catch (err) {
