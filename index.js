@@ -18,7 +18,7 @@ app.post("/tasks", async (req, res) => {
   try {
     const { description, prettyDate } = req.body;
     const newTask = await pool.query(
-      "INSERT INTO tasks (description, finishBy) VALUES($1, $2) RETURNING *",
+      "INSERT INTO tasks (description, finishby) VALUES($1, $2) RETURNING *",
       [description, prettyDate]
     );
     res.json(newTask.rows);
