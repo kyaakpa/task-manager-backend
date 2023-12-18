@@ -7,6 +7,10 @@ app.use(cors());
 app.use(express.json());
 
 //routes
+app.get("/", (req, res) => {
+  res.send("Task MANAGER API");
+});
+
 //create a task
 app.post("/tasks", async (req, res) => {
   try {
