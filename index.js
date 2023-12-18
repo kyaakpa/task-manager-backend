@@ -16,7 +16,7 @@ const pgConfig = {
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 5500;
+const PORT = process.env.PORT;
 const client = new pg.Client(pgConfig);
 client.connect();
 
