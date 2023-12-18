@@ -1,12 +1,11 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const config = require("./db");
 const pg = require("pg");
 require("dotenv").config();
 
-const config = {
-  user: process.env.PGHOST,
+const pgConfig = {
+  user: process.env.PGUSER,
   password: process.env.PGPASSWORD,
   host: process.env.PGHOST,
   port: 5432,
@@ -17,8 +16,9 @@ const config = {
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT;
-const client = new pg.Client(config);
+const PORT = process.env.PORT || 5500;
+const client = new pg.Client(pgConfig);
+client.connect();
 
 //routes
 app.get("/", (req, res) => {
@@ -28,7 +28,6 @@ app.get("/", (req, res) => {
 //create a task
 app.post("/tasks", async (req, res) => {
   try {
-    client.connect();
     const { description, prettyDate } = req.body;
     const newTask = await client.query(
       "INSERT INTO tasks (description, finishby) VALUES($1, $2) RETURNING *;",
@@ -42,7 +41,6 @@ app.post("/tasks", async (req, res) => {
 //get all tasks
 app.get("/tasks", async (req, res) => {
   try {
-    client.connect();
     const allTasks = await client.query("SELECT * FROM tasks;");
     res.json(allTasks.rows);
   } catch (err) {
@@ -52,7 +50,6 @@ app.get("/tasks", async (req, res) => {
 //get a task
 app.get("/tasks/:id", async (req, res) => {
   try {
-    client.connect();
     const { id } = req.params;
     const getSingleTask = await client.query(
       "SELECT * FROM tasks WHERE task_id=$1;",
@@ -66,7 +63,6 @@ app.get("/tasks/:id", async (req, res) => {
 //update a task
 app.put("/tasks/:id", async (req, res) => {
   try {
-    client.connect();
     const { id } = req.params;
     const { description, prettyDate } = req.body;
     const updateTask = await client.query(
@@ -80,9 +76,6 @@ app.put("/tasks/:id", async (req, res) => {
 });
 //delete a task
 app.delete("/tasks/:id", async (req, res) => {
-  client.connect((err) => {
-    if (err) throw err;
-  });
   try {
     const { id } = req.params;
     const deleteTask = await client.query(
