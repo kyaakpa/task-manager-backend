@@ -1,12 +1,21 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const pool = require("./db");
+const config = require("./db");
+const pg = require("pg");
 
 app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT;
+const client = new pg.Client(config);
+
+client.connect((err) => {
+  if (err) throw err;
+  else {
+    queryDatabase();
+  }
+});
 
 //routes
 app.get("/", (req, res) => {
@@ -17,7 +26,7 @@ app.get("/", (req, res) => {
 app.post("/tasks", async (req, res) => {
   try {
     const { description, prettyDate } = req.body;
-    const newTask = await pool.query(
+    const newTask = await client.query(
       "INSERT INTO tasks (description, finishby) VALUES($1, $2) RETURNING *",
       [description, prettyDate]
     );
@@ -29,7 +38,7 @@ app.post("/tasks", async (req, res) => {
 //get all tasks
 app.get("/tasks", async (req, res) => {
   try {
-    const allTasks = await pool.query("SELECT * FROM tasks");
+    const allTasks = await client.query("SELECT * FROM tasks");
     res.json(allTasks.rows);
   } catch (err) {
     console.error(err.message);
@@ -39,7 +48,7 @@ app.get("/tasks", async (req, res) => {
 app.get("/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const getSingleTask = await pool.query(
+    const getSingleTask = await client.query(
       "SELECT * FROM tasks WHERE task_id=$1",
       [id]
     );
@@ -53,7 +62,7 @@ app.put("/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { description, prettyDate } = req.body;
-    const updateTask = await pool.query(
+    const updateTask = await client.query(
       "UPDATE tasks SET description=$1, finishby=$2 WHERE task_id=$3",
       [description, prettyDate, id]
     );
@@ -66,9 +75,10 @@ app.put("/tasks/:id", async (req, res) => {
 app.delete("/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const deleteTask = await pool.query("DELETE FROM tasks WHERE task_id=$1", [
-      id,
-    ]);
+    const deleteTask = await client.query(
+      "DELETE FROM tasks WHERE task_id=$1",
+      [id]
+    );
     res.json("Task was deleted.");
   } catch (err) {
     console.error(err.message);

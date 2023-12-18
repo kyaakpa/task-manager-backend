@@ -1,12 +1,13 @@
-const Pool = require("pg").Pool;
+const pg = require("pg");
 require("dotenv").config();
 
-const pool = new Pool({
+const config = {
   user: process.env.PGHOST,
   password: process.env.PGPASSWORD,
   host: process.env.HOST,
   port: process.env.PORT,
   database: process.env.DATABASE,
-});
+  ssl: true,
+};
 
-module.exports = pool;
+module.exports = config;
