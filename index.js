@@ -6,6 +6,8 @@ const pool = require("./db");
 app.use(cors());
 app.use(express.json());
 
+const PORT = process.env.PORT;
+
 //routes
 app.get("/", (req, res) => {
   res.send("Task MANAGER API");
@@ -73,6 +75,6 @@ app.delete("/tasks/:id", async (req, res) => {
   }
 });
 
-app.listen(5500, () => {
-  console.log("Server started on port 5500.");
+app.listen(PORT, () => {
+  console.log(`Listening on PORT: ${PORT}`);
 });
