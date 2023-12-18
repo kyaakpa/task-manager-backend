@@ -10,13 +10,6 @@ app.use(express.json());
 const PORT = process.env.PORT;
 const client = new pg.Client(config);
 
-client.connect((err) => {
-  if (err) throw err;
-  else {
-    queryDatabase();
-  }
-});
-
 //routes
 app.get("/", (req, res) => {
   res.send("Task MANAGER API");
@@ -24,6 +17,10 @@ app.get("/", (req, res) => {
 
 //create a task
 app.post("/tasks", async (req, res) => {
+  client.connect((err) => {
+    if (err) throw err;
+  });
+
   try {
     const { description, prettyDate } = req.body;
     const newTask = await client.query(
@@ -37,6 +34,9 @@ app.post("/tasks", async (req, res) => {
 });
 //get all tasks
 app.get("/tasks", async (req, res) => {
+  client.connect((err) => {
+    if (err) throw err;
+  });
   try {
     const allTasks = await client.query("SELECT * FROM tasks");
     res.json(allTasks.rows);
@@ -46,6 +46,9 @@ app.get("/tasks", async (req, res) => {
 });
 //get a task
 app.get("/tasks/:id", async (req, res) => {
+  client.connect((err) => {
+    if (err) throw err;
+  });
   try {
     const { id } = req.params;
     const getSingleTask = await client.query(
@@ -59,6 +62,9 @@ app.get("/tasks/:id", async (req, res) => {
 });
 //update a task
 app.put("/tasks/:id", async (req, res) => {
+  client.connect((err) => {
+    if (err) throw err;
+  });
   try {
     const { id } = req.params;
     const { description, prettyDate } = req.body;
@@ -73,6 +79,9 @@ app.put("/tasks/:id", async (req, res) => {
 });
 //delete a task
 app.delete("/tasks/:id", async (req, res) => {
+  client.connect((err) => {
+    if (err) throw err;
+  });
   try {
     const { id } = req.params;
     const deleteTask = await client.query(
