@@ -28,10 +28,10 @@ app.get("/", (req, res) => {
 //create a task
 app.post("/tasks", async (req, res) => {
   try {
-    const { description, prettyDate } = req.body;
+    const { description, date } = req.body;
     const newTask = await client.query(
       "INSERT INTO tasks (description, finishby) VALUES($1, $2) RETURNING *;",
-      [description, prettyDate]
+      [description, date]
     );
     res.json(newTask.rows);
   } catch (err) {
@@ -64,10 +64,10 @@ app.get("/tasks/:id", async (req, res) => {
 app.put("/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { description, prettyDate } = req.body;
+    const { description, date } = req.body;
     const updateTask = await client.query(
       "UPDATE tasks SET description=$1, finishby=$2 WHERE task_id=$3;",
-      [description, prettyDate, id]
+      [description, date, id]
     );
     res.json("Task was updated.");
   } catch (err) {
